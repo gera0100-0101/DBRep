@@ -37,6 +37,8 @@ services:
     networks:
       - food_store_network
     restart: unless-stopped
+    volumes:
+      - backend_uploads:/app/uploads/images
     command: >
       sh -c "echo 'Waiting for database...' &&
              sleep 5 &&
@@ -66,3 +68,4 @@ networks:
 
 volumes:
   postgres_data:
+  backend_uploads:

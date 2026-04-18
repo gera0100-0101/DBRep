@@ -1,1 +1,49 @@
-Nothing should be ignored based on the provided file changes. The only modified file is a Python source file (`backend/routers/workers.py`), which should not be added to .gitignore.
+```
+# Dependencies
+.venv/
+venv/
+__pycache__/
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+.Python
+__pycache__/
+*.so
+.Python
+.coverage
+htmlcov/
+.coverage.*
+.noserc
+.tox/
+.pytest_cache/
+.mypy_cache/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerenv
+```
