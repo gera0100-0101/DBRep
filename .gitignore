@@ -1,1 +1,53 @@
-Nothing should be ignored since only a source code file (`backend/main.py`) was modified and there are no build artifacts, dependencies, or temporary files in the changes.
+```
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.egg-info/
+.Python/
+
+# Build artifacts
+dist/
+build/
+target/
+coverage/
+htmlcov/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Logs
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.*
+
+# IDE specific
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Docker
+.dockerenv
+```
