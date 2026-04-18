@@ -172,6 +172,23 @@ class WorkerResponse(WorkerBase):
     class Config:
         from_attributes = True
 
+# Check schema (must be before OrderResponse due to forward reference)
+class CheckBase(BaseModel):
+    order_id: int
+    total_price: Decimal
+
+class CheckCreate(CheckBase):
+    created_date: Optional[date] = None
+    created_time: Optional[time] = None
+
+class CheckResponse(CheckBase):
+    id: int
+    created_date: date
+    created_time: time
+    
+    class Config:
+        from_attributes = True
+
 # Order Item schemas
 class OrderItemBase(BaseModel):
     product_id: int
@@ -210,7 +227,7 @@ class OrderResponse(OrderBase):
     items: List[OrderItemResponse] = []
     courier: Optional[WorkerResponse] = None
     customer: Optional[CustomerResponse] = None
-    check: Optional['CheckResponse'] = None
+    check: Optional[CheckResponse] = None
     
     class Config:
         from_attributes = True
@@ -222,25 +239,8 @@ class AdminOrderResponse(OrderBase):
     items: List[OrderItemResponse] = []
     courier: Optional[WorkerResponse] = None
     customer: Optional[CustomerResponse] = None
-    check: Optional['CheckResponse'] = None
+    check: Optional[CheckResponse] = None
     payment: Optional[PaymentResponse] = None
-    
-    class Config:
-        from_attributes = True
-
-# Check schema
-class CheckBase(BaseModel):
-    order_id: int
-    total_price: Decimal
-
-class CheckCreate(CheckBase):
-    created_date: Optional[date] = None
-    created_time: Optional[time] = None
-
-class CheckResponse(CheckBase):
-    id: int
-    created_date: date
-    created_time: time
     
     class Config:
         from_attributes = True
