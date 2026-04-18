@@ -1,48 +1,52 @@
 ```
 # Dependencies
-.venv/
-venv/
-__pycache__/
 node_modules/
+venv/
+.venv/
+__pycache__/
+*.egg-info/
+.Python/
 
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Editors
-.vscode/
-.idea/
-
-# Python
+# Build artifacts
+dist/
+build/
+target/
+coverage/
+htmlcov/
 *.pyc
 *.pyo
 *.pyd
-.Python
-__pycache__/
 *.so
-.Python
-.coverage
-htmlcov/
-.coverage.*
-.noserc
-.tox/
-.pytest_cache/
-.mypy_cache/
+*.dylib
+*.dll
+*.exe
+*.out
 
 # Build artifacts
-build/
 dist/
-*.egg-info/
+build/
+target/
 
-# OS generated files
+# Logs
+*.log
+*.tmp
+*.swp
+*.swo
+*~
 .DS_Store
 Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.*
+
+# IDE specific
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
 
 # Docker
 .dockerenv
