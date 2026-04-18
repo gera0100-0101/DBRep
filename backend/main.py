@@ -1,4 +1,5 @@
-from fastapi import FastAPI, StaticFiles
+from fastapi import FastAPI
+from starlette.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from db_session import init_db, engine
 from models import Base
