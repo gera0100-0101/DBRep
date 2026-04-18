@@ -1,5 +1,6 @@
-from fastapi import FastAPI, StaticFiles
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from db_session import init_db, engine
 from models import Base
 from routers import api_router
@@ -7,11 +8,6 @@ import models
 from pathlib import Path
 
 app = FastAPI(title="Food Store API", description="Internet store with food delivery")
-
-# Mount static files for uploaded images
-UPLOAD_DIR = Path("/app/uploads")
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 # CORS middleware
 app.add_middleware(
@@ -21,6 +17,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static files for uploaded images
+UPLOAD_DIR = Path("/app/uploads")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 # Include routers
 app.include_router(api_router, prefix="/api")
