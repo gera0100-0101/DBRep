@@ -1,9 +1,53 @@
 ```
-# Environment
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.egg-info/
+.Python/
+
+# Build artifacts
+dist/
+build/
+target/
+coverage/
+htmlcov/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Logs
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Environment variables
 .env
 .env.local
 .env.*
 
-# Editors
+# IDE specific
 .vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Docker
+.dockerenv
 ```
