@@ -39,24 +39,49 @@ async def startup_event():
             db.refresh(company)
             
             # Create shop
-            shop = models.Company(company_id=company.id, address="Main street 10")
+            shop = models.Shop(company_id=company.id, address="Main street 10")
             db.add(shop)
             db.commit()
             db.refresh(shop)
             
             # Create categories
-            drink_category = models.Category(name="Drinks")
-            snacks_category = models.Category(name="Snacks")
+            drink_category = models.Category(name="Drinks", description="Various drinks")
+            snacks_category = models.Category(name="Snacks", description="Tasty snacks")
             db.add_all([drink_category, snacks_category])
             db.commit()
             
             # Create manufacturers
-            coca_manufacturer = models.Manufacturer(name="Coca Cola")
-            lays_manufacturer = models.Manufacturer(name="Lays")
+            coca_manufacturer = models.Manufacturer(name="Coca Cola", location="USA")
+            lays_manufacturer = models.Manufacturer(name="Lays", location="USA")
             db.add_all([coca_manufacturer, lays_manufacturer])
+            db.commit()
+            db.refresh(coca_manufacturer)
+            db.refresh(lays_manufacturer)
+            
+            # Create products
+            cola_product = models.Product(
+                shop_id=shop.id,
+                category_id=drink_category.id,
+                manufacturer_id=coca_manufacturer.id,
+                name="Cola 1L",
+                price=2.50,
+                stock_amount=100
+            )
+            chips_product = models.Product(
+                shop_id=shop.id,
+                category_id=snacks_category.id,
+                manufacturer_id=lays_manufacturer.id,
+                name="Chips",
+                price=1.80,
+                stock_amount=50
+            )
+            db.add_all([cola_product, chips_product])
             db.commit()
             
             print("Database seeded successfully!")
+    except Exception as e:
+        db.rollback()
+        print(f"Error seeding database: {e}")
     finally:
         db.close()
 
