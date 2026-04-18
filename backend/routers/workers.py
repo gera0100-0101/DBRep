@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from db_session import get_db
 import models
@@ -7,10 +7,12 @@ import schemas
 
 router = APIRouter(prefix="/workers", tags=["workers"])
 
-@router.get("/", response_model=List[schemas.WorkerResponse])
+@router.get("/", response_model=List[WorkerWithPostResponse])
 def get_workers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Get all workers."""
-    workers = db.query(models.Worker).offset(skip).limit(limit).all()
+    workers = db.query(models.Worker).options(
+        joinedload(models.Worker.post)
+    ).offset(skip).limit(limit).all()
     return workers
 
 @router.get("/{worker_id}", response_model=schemas.WorkerResponse)
@@ -68,7 +70,7 @@ def delete_worker(worker_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Worker deleted successfully"}
 
-@router.get("/couriers/", response_model=List[schemas.WorkerResponse])
+@router.get("/couriers/", response_model=List[WorkerWithPostResponse])
 def get_couriers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Get all workers with courier post."""
     # Find courier post
@@ -77,7 +79,9 @@ def get_couriers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db))
     if not courier_post:
         return []
     
-    couriers = db.query(models.Worker).filter(
+    couriers = db.query(models.Worker).options(
+        joinedload(models.Worker.post)
+    ).filter(
         models.Worker.post_id == courier_post.id
     ).offset(skip).limit(limit).all()
     
