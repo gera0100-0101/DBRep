@@ -1,0 +1,16 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+*.md
+!package.json
+!package-lock.json
+docker-compose.yml
+init.sql
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+dist
+build
