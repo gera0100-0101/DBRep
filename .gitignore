@@ -1,9 +1,26 @@
 ```
 # Dependencies
 node_modules/
-.venv/
 venv/
+.venv/
 __pycache__/
+*.egg-info/
+.Python/
+
+# Build artifacts
+dist/
+build/
+target/
+coverage/
+htmlcov/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
 
 # Build artifacts
 dist/
@@ -12,122 +29,25 @@ target/
 
 # Logs
 *.log
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Editors
-.vscode/
-.idea/
-
-# Python
-*.pyc
-*.pyo
-*.pyd
-*.py~
-*.py.class
-*.py.backup
-*.py.swp
-*.py.swo
-*.py.tmp
-*.py.bak
-*.py~*
-*.py#*
-*.py%*
-*.py@*
-*.py^*
-*.py$*
-*.py!*
-*.py&*
-*.py|*
-*.py`*
-*.py'*
-*.py"*
-*.py;*
-*.py:*
-*.py<*
-*.py>*
-*.py?*
-*.py/*
-*.py\*
-*.py[*
-*.py]*
-*.py{*
-*.py}*
-*.py(*
-*.py)*
-*.py+*
-*.py=*
-*.py-*
-*.py_*
-*.py.*
-*.py,*
-*.py;*
-*.py'*
-*.py"*
-*.py`*
-*.py~*
-*.py#*
-*.py%*
-*.py@*
-*.py^*
-*.py$*
-*.py!*
-*.py&*
-*.py|*
-*.py'*
-*.py"*
-*.py;*
-*.py:*
-*.py<*
-*.py>*
-*.py?*
-*.py/*
-*.py\*
-*.py[*
-*.py]*
-*.py{*
-*.py}*
-*.py(*
-*.py)*
-*.py+*
-*.py=*
-*.py-*
-*.py_*
-*.py.*
-*.py,*
-
-# General temp files
 *.tmp
-*.temp
 *.swp
 *.swo
 *~
-.#*
-.%*
-._*
 .DS_Store
 Thumbs.db
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
+# Environment variables
+.env
+.env.local
+.env.*
 
-# MyPy cache
-.mypy_cache/
+# IDE specific
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
 
-# PyTest cache
-.pytest_cache/
-
-# Gradle
-.gradle/
-
-# Julia
-julia-*/
-
-# Zig
-zig*/
+# Docker
+.dockerenv
 ```
