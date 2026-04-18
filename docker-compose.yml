@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: food_store_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: food_store
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - food_store_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d food_store"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: food_store_backend
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/food_store
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - food_store_network
+    restart: unless-stopped
+    command: >
+      sh -c "echo 'Waiting for database...' &&
+             sleep 5 &&
+             uvicorn main:app --host 0.0.0.0 --port 8000"
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:8000/api
+    container_name: food_store_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    depends_on:
+      - backend
+    networks:
+      - food_store_network
+    restart: unless-stopped
+
+networks:
+  food_store_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
