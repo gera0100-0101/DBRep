@@ -1,29 +1,48 @@
 ```
 # Dependencies
 node_modules/
-.venv/
 venv/
+.venv/
 __pycache__/
-*.pyc
-.DS_Store
-.env
-.env.local
-*.env.*
+*.egg-info/
+.Python/
 
 # Build artifacts
 dist/
 build/
 target/
+coverage/
+htmlcov/
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
 
-# Editors
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+.env.*
+
+# IDE specific
 .vscode/
 .idea/
-
-# Logs
-*.log
+*.iml
+*.ipr
+*.iws
 
 # Docker
-.dockerignore
-Dockerfile
-docker-compose.yml
+.dockerenv
 ```
