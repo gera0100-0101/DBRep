@@ -58,6 +58,23 @@ async def startup_event():
             db.refresh(coca_manufacturer)
             db.refresh(lays_manufacturer)
             
+            # Create courier post
+            courier_post = models.Post(name="Courier", salary=500.00)
+            db.add(courier_post)
+            db.commit()
+            db.refresh(courier_post)
+            
+            # Create sample worker (courier)
+            sample_courier = models.Worker(
+                full_name="John Doe",
+                email="john@example.com",
+                phone_number="+1234567890",
+                post_id=courier_post.id
+            )
+            db.add(sample_courier)
+            db.commit()
+            db.refresh(sample_courier)
+            
             # Create products
             cola_product = models.Product(
                 shop_id=shop.id,
@@ -76,6 +93,31 @@ async def startup_event():
                 stock_amount=50
             )
             db.add_all([cola_product, chips_product])
+            db.commit()
+            
+            # Create image group and images for products
+            cola_image_group = models.ProductImageGroup(product_id=cola_product.id)
+            db.add(cola_image_group)
+            db.commit()
+            db.refresh(cola_image_group)
+            
+            cola_image = models.Image(
+                image_group_id=cola_image_group.id,
+                link="https://example.com/images/cola.jpg"
+            )
+            db.add(cola_image)
+            db.commit()
+            
+            chips_image_group = models.ProductImageGroup(product_id=chips_product.id)
+            db.add(chips_image_group)
+            db.commit()
+            db.refresh(chips_image_group)
+            
+            chips_image = models.Image(
+                image_group_id=chips_image_group.id,
+                link="https://example.com/images/chips.jpg"
+            )
+            db.add(chips_image)
             db.commit()
             
             print("Database seeded successfully!")

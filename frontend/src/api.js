@@ -16,6 +16,10 @@ export const productApi = {
   create: (product) => api.post('/products/', product),
   update: (id, product) => api.put(`/products/${id}`, product),
   delete: (id) => api.delete(`/products/${id}`),
+  getImages: (productId) => api.get(`/products/${productId}/images`),
+  addImage: (productId, imageData) => api.post(`/products/${productId}/images`, imageData),
+  updateImage: (productId, imageId, imageData) => api.put(`/products/${productId}/images/${imageId}`, imageData),
+  deleteImage: (productId, imageId) => api.delete(`/products/${productId}/images/${imageId}`),
 };
 
 export const categoryApi = {
@@ -35,6 +39,17 @@ export const orderApi = {
   getAll: () => api.get('/orders/'),
   getById: (id) => api.get(`/orders/${id}`),
   updateStatus: (id, status) => api.put(`/orders/${id}/status?status=${status}`),
+  assignCourier: (orderId, courierId) => api.put(`/orders/${orderId}/courier?courier_id=${courierId}`),
+  getAdminOrders: () => api.get('/orders/admin/'),
+};
+
+export const workerApi = {
+  getAll: () => api.get('/workers/'),
+  getById: (id) => api.get(`/workers/${id}`),
+  getCouriers: () => api.get('/workers/couriers/'),
+  create: (worker) => api.post('/workers/', worker),
+  update: (id, worker) => api.put(`/workers/${id}`, worker),
+  delete: (id) => api.delete(`/workers/${id}`),
 };
 
 export default api;

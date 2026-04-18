@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from typing import List
+from sqlalchemy.orm import Session, joinedload
+from typing import List, Optional
 from db_session import get_db
 import models
 import schemas
@@ -84,12 +84,22 @@ def checkout(checkout_request: schemas.CheckoutRequest, db: Session = Depends(ge
 
 @router.get("/", response_model=List[schemas.OrderResponse])
 def get_orders(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    orders = db.query(models.Order).offset(skip).limit(limit).all()
+    orders = db.query(models.Order).options(
+        joinedload(models.Order.items).joinedload(models.OrderItem.product),
+        joinedload(models.Order.courier).joinedload(models.Worker.post),
+        joinedload(models.Order.customer),
+        joinedload(models.Order.check)
+    ).offset(skip).limit(limit).all()
     return orders
 
 @router.get("/{order_id}", response_model=schemas.OrderResponse)
 def get_order(order_id: int, db: Session = Depends(get_db)):
-    order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    order = db.query(models.Order).options(
+        joinedload(models.Order.items).joinedload(models.OrderItem.product),
+        joinedload(models.Order.courier).joinedload(models.Worker.post),
+        joinedload(models.Order.customer),
+        joinedload(models.Order.check)
+    ).filter(models.Order.id == order_id).first()
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
@@ -104,3 +114,31 @@ def update_order_status(order_id: int, status: str, db: Session = Depends(get_db
     db.commit()
     db.refresh(order)
     return order
+
+@router.put("/{order_id}/courier", response_model=schemas.OrderResponse)
+def assign_courier(order_id: int, courier_id: int, db: Session = Depends(get_db)):
+    """Assign a courier to an order."""
+    order = db.query(models.Order).filter(models.Order.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    courier = db.query(models.Worker).filter(models.Worker.id == courier_id).first()
+    if not courier:
+        raise HTTPException(status_code=404, detail="Courier not found")
+    
+    order.courier_id = courier_id
+    db.commit()
+    db.refresh(order)
+    return order
+
+@router.get("/admin/", response_model=List[schemas.AdminOrderResponse])
+def get_admin_orders(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """Get all orders with full details for admin panel including courier info."""
+    orders = db.query(models.Order).options(
+        joinedload(models.Order.items).joinedload(models.OrderItem.product),
+        joinedload(models.Order.courier).joinedload(models.Worker.post),
+        joinedload(models.Order.customer),
+        joinedload(models.Order.check),
+        joinedload(models.Order.payment)
+    ).offset(skip).limit(limit).all()
+    return orders
