@@ -102,6 +102,7 @@ class ImageCreate(ImageBase):
 
 class ImageResponse(ImageBase):
     id: int
+    image_group_id: Optional[int] = None
     
     class Config:
         from_attributes = True
@@ -134,6 +135,43 @@ class PaymentResponse(PaymentBase):
     class Config:
         from_attributes = True
 
+# Post schemas
+class PostBase(BaseModel):
+    name: str
+    salary: Decimal
+
+class PostCreate(PostBase):
+    pass
+
+class PostResponse(PostBase):
+    id: int
+    
+    class Config:
+        from_attributes = True
+
+# Worker schemas
+class WorkerBase(BaseModel):
+    full_name: str
+    email: Optional[str] = None
+    phone_number: Optional[str] = None
+    post_id: Optional[int] = None
+
+class WorkerCreate(WorkerBase):
+    pass
+
+class WorkerUpdate(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    phone_number: Optional[str] = None
+    post_id: Optional[int] = None
+
+class WorkerResponse(WorkerBase):
+    id: int
+    post: Optional[PostResponse] = None
+    
+    class Config:
+        from_attributes = True
+
 # Order Item schemas
 class OrderItemBase(BaseModel):
     product_id: int
@@ -146,6 +184,7 @@ class OrderItemCreate(OrderItemBase):
 class OrderItemResponse(OrderItemBase):
     id: int
     order_id: int
+    product: Optional[ProductResponse] = None
     
     class Config:
         from_attributes = True
@@ -169,6 +208,39 @@ class OrderResponse(OrderBase):
     created_at: datetime
     status: str
     items: List[OrderItemResponse] = []
+    courier: Optional[WorkerResponse] = None
+    customer: Optional[CustomerResponse] = None
+    check: Optional['CheckResponse'] = None
+    
+    class Config:
+        from_attributes = True
+
+class AdminOrderResponse(OrderBase):
+    id: int
+    created_at: datetime
+    status: str
+    items: List[OrderItemResponse] = []
+    courier: Optional[WorkerResponse] = None
+    customer: Optional[CustomerResponse] = None
+    check: Optional['CheckResponse'] = None
+    payment: Optional[PaymentResponse] = None
+    
+    class Config:
+        from_attributes = True
+
+# Check schema
+class CheckBase(BaseModel):
+    order_id: int
+    total_price: Decimal
+
+class CheckCreate(CheckBase):
+    created_date: Optional[date] = None
+    created_time: Optional[time] = None
+
+class CheckResponse(CheckBase):
+    id: int
+    created_date: date
+    created_time: time
     
     class Config:
         from_attributes = True

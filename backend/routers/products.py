@@ -55,3 +55,98 @@ def delete_product(product_id: int, db: Session = Depends(get_db)):
 def get_products_by_category(category_id: int, db: Session = Depends(get_db)):
     products = db.query(models.Product).filter(models.Product.category_id == category_id).all()
     return products
+
+# Image management endpoints
+@router.post("/{product_id}/images", response_model=schemas.ImageResponse)
+def add_product_image(product_id: int, image_data: schemas.ImageCreate, db: Session = Depends(get_db)):
+    """Add an image to a product. Creates image group if it doesn't exist."""
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Get or create image group for this product
+    image_group = db.query(models.ProductImageGroup).filter(
+        models.ProductImageGroup.product_id == product_id
+    ).first()
+    
+    if not image_group:
+        image_group = models.ProductImageGroup(product_id=product_id)
+        db.add(image_group)
+        db.commit()
+        db.refresh(image_group)
+    
+    # Create the image
+    image = models.Image(
+        image_group_id=image_group.id,
+        link=image_data.link
+    )
+    db.add(image)
+    db.commit()
+    db.refresh(image)
+    
+    return image
+
+@router.get("/{product_id}/images", response_model=List[schemas.ImageResponse])
+def get_product_images(product_id: int, db: Session = Depends(get_db)):
+    """Get all images for a product."""
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    image_group = db.query(models.ProductImageGroup).filter(
+        models.ProductImageGroup.product_id == product_id
+    ).first()
+    
+    if not image_group:
+        return []
+    
+    return image_group.images
+
+@router.put("/{product_id}/images/{image_id}", response_model=schemas.ImageResponse)
+def update_product_image(product_id: int, image_id: int, image_data: schemas.ImageBase, db: Session = Depends(get_db)):
+    """Update an image link for a product."""
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    image = db.query(models.Image).filter(models.Image.id == image_id).first()
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+    # Verify image belongs to this product
+    image_group = db.query(models.ProductImageGroup).filter(
+        models.ProductImageGroup.product_id == product_id
+    ).first()
+    
+    if not image_group or image.image_group_id != image_group.id:
+        raise HTTPException(status_code=400, detail="Image does not belong to this product")
+    
+    image.link = image_data.link
+    db.commit()
+    db.refresh(image)
+    
+    return image
+
+@router.delete("/{product_id}/images/{image_id}")
+def delete_product_image(product_id: int, image_id: int, db: Session = Depends(get_db)):
+    """Delete an image from a product."""
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    image = db.query(models.Image).filter(models.Image.id == image_id).first()
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+    # Verify image belongs to this product
+    image_group = db.query(models.ProductImageGroup).filter(
+        models.ProductImageGroup.product_id == product_id
+    ).first()
+    
+    if not image_group or image.image_group_id != image_group.id:
+        raise HTTPException(status_code=400, detail="Image does not belong to this product")
+    
+    db.delete(image)
+    db.commit()
+    
+    return {"message": "Image deleted successfully"}
