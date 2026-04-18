@@ -147,7 +147,9 @@ function AdminPanel() {
     setEditingImageId(null);
     try {
       const imagesRes = await productApi.getImages(product.id);
-      setProductImages(imagesRes.data);
+      // Ensure we always have an array
+      const images = Array.isArray(imagesRes.data) ? imagesRes.data : [];
+      setProductImages(images);
     } catch (error) {
       console.error('Error loading images:', error);
       setProductImages([]);
@@ -190,7 +192,9 @@ function AdminPanel() {
       setImageForm({ link: '', file: null });
       setEditingImageId(null);
       const imagesRes = await productApi.getImages(selectedProduct.id);
-      setProductImages(imagesRes.data);
+      // Ensure we always have an array
+      const images = Array.isArray(imagesRes.data) ? imagesRes.data : [];
+      setProductImages(images);
       // Reset file input
       const fileInput = document.getElementById('imageFile');
       if (fileInput) fileInput.value = '';
@@ -211,7 +215,9 @@ function AdminPanel() {
     try {
       await productApi.deleteImage(selectedProduct.id, imageId);
       const imagesRes = await productApi.getImages(selectedProduct.id);
-      setProductImages(imagesRes.data);
+      // Ensure we always have an array
+      const images = Array.isArray(imagesRes.data) ? imagesRes.data : [];
+      setProductImages(images);
     } catch (error) {
       console.error('Error deleting image:', error);
       alert('Failed to delete image');
@@ -628,11 +634,11 @@ function AdminPanel() {
 
             <div className="images-list">
               <h4>Current Images</h4>
-              {productImages.length === 0 ? (
+              {!productImages || productImages.length === 0 ? (
                 <p className="no-images">No images yet. Add one above.</p>
               ) : (
                 <div className="images-grid">
-                  {productImages.map(image => (
+                  {Array.isArray(productImages) && productImages.map(image => (
                     <div key={image.id} className="image-item">
                       <img 
                         src={`${import.meta.env.VITE_API_URL}${image.link}`} 
