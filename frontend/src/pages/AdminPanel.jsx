@@ -634,7 +634,15 @@ function AdminPanel() {
                 <div className="images-grid">
                   {productImages.map(image => (
                     <div key={image.id} className="image-item">
-                      <img src={image.link.startsWith('/') ? `${import.meta.env.VITE_API_URL}${image.link}` : image.link} alt="Product" style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '4px' }} />
+                      <img 
+                        src={`${import.meta.env.VITE_API_URL}${image.link}`} 
+                        alt="Product" 
+                        style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '4px' }} 
+                        onError={(e) => {
+                          console.error('Image load error:', e.target.src);
+                          e.target.src = 'https://via.placeholder.com/150?text=No+Image';
+                        }}
+                      />
                       <div className="image-actions">
                         <button 
                           className="action-btn edit-btn"
