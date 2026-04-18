@@ -172,6 +172,14 @@ class WorkerResponse(WorkerBase):
     class Config:
         from_attributes = True
 
+class WorkerWithPostResponse(WorkerBase):
+    id: int
+    post_id: Optional[int] = None
+    post: Optional[PostResponse] = None
+    
+    class Config:
+        from_attributes = True
+
 # Check schema (must be before OrderResponse due to forward reference)
 class CheckBase(BaseModel):
     order_id: int

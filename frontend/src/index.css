@@ -545,3 +545,98 @@ nav a:hover {
 .action-btn.image-btn:hover {
   background: #1976D2;
 }
+
+.images-btn {
+  background-color: #9C27B0;
+  color: white;
+}
+
+.images-btn:hover {
+  background-color: #7B1FA2;
+}
+
+.modal-large {
+  max-width: 800px;
+}
+
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.image-item {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 10px;
+  background: #f9f9f9;
+}
+
+.image-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.image-actions .action-btn {
+  flex: 1;
+  padding: 6px;
+  font-size: 0.85rem;
+}
+
+.no-images {
+  color: #666;
+  text-align: center;
+  padding: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.admin-subtitle {
+  font-size: 1.2rem;
+  color: #666;
+  margin: 0;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-new {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.status-processing {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.status-delivering {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.status-delivered {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.status-cancelled {
+  background-color: #ffebee;
+  color: #d32f2f;
+}

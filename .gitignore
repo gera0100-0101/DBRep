@@ -22,7 +22,12 @@ htmlcov/
 *.exe
 *.out
 
-# Logs and temporary files
+# Build artifacts
+dist/
+build/
+target/
+
+# Logs
 *.log
 *.tmp
 *.swp
