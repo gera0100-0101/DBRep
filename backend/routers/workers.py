@@ -7,7 +7,7 @@ import schemas
 
 router = APIRouter(prefix="/workers", tags=["workers"])
 
-@router.get("/", response_model=List[WorkerWithPostResponse])
+@router.get("/", response_model=List[schemas.WorkerWithPostResponse])
 def get_workers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Get all workers."""
     workers = db.query(models.Worker).options(
@@ -70,7 +70,7 @@ def delete_worker(worker_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Worker deleted successfully"}
 
-@router.get("/couriers/", response_model=List[WorkerWithPostResponse])
+@router.get("/couriers/", response_model=List[schemas.WorkerWithPostResponse])
 def get_couriers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Get all workers with courier post."""
     # Find courier post
