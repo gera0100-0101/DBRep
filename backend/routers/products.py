@@ -1,11 +1,18 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from db_session import get_db
 import models
 import schemas
+import os
+import shutil
+from pathlib import Path
 
 router = APIRouter(prefix="/products", tags=["products"])
+
+# Directory for storing uploaded images
+UPLOAD_DIR = Path("/app/uploads/images")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 @router.get("/", response_model=List[schemas.ProductResponse])
 def get_products(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
@@ -58,11 +65,17 @@ def get_products_by_category(category_id: int, db: Session = Depends(get_db)):
 
 # Image management endpoints
 @router.post("/{product_id}/images", response_model=schemas.ImageResponse)
-def add_product_image(product_id: int, image_data: schemas.ImageCreate, db: Session = Depends(get_db)):
-    """Add an image to a product. Creates image group if it doesn't exist."""
+def add_product_image(product_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Add an image to a product by uploading a file. Creates image group if it doesn't exist."""
     product = db.query(models.Product).filter(models.Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Validate file type
+    allowed_extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+    file_ext = os.path.splitext(file.filename)[1].lower()
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail=f"File type not allowed. Allowed types: {', '.join(allowed_extensions)}")
     
     # Get or create image group for this product
     image_group = db.query(models.ProductImageGroup).filter(
@@ -75,10 +88,20 @@ def add_product_image(product_id: int, image_data: schemas.ImageCreate, db: Sess
         db.commit()
         db.refresh(image_group)
     
-    # Create the image
+    # Generate unique filename
+    import uuid
+    unique_filename = f"{uuid.uuid4()}{file_ext}"
+    file_path = UPLOAD_DIR / unique_filename
+    
+    # Save the file
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    # Create the image record with relative path
+    image_link = f"/uploads/images/{unique_filename}"
     image = models.Image(
         image_group_id=image_group.id,
-        link=image_data.link
+        link=image_link
     )
     db.add(image)
     db.commit()
@@ -103,8 +126,8 @@ def get_product_images(product_id: int, db: Session = Depends(get_db)):
     return image_group.images
 
 @router.put("/{product_id}/images/{image_id}", response_model=schemas.ImageResponse)
-def update_product_image(product_id: int, image_id: int, image_data: schemas.ImageBase, db: Session = Depends(get_db)):
-    """Update an image link for a product."""
+def update_product_image(product_id: int, image_id: int, file: UploadFile = File(...), db: Session = Depends(get_db)):
+    """Update an image file for a product."""
     product = db.query(models.Product).filter(models.Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -121,7 +144,28 @@ def update_product_image(product_id: int, image_id: int, image_data: schemas.Ima
     if not image_group or image.image_group_id != image_group.id:
         raise HTTPException(status_code=400, detail="Image does not belong to this product")
     
-    image.link = image_data.link
+    # Validate file type
+    allowed_extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+    file_ext = os.path.splitext(file.filename)[1].lower()
+    if file_ext not in allowed_extensions:
+        raise HTTPException(status_code=400, detail=f"File type not allowed. Allowed types: {', '.join(allowed_extensions)}")
+    
+    # Delete old file if it exists
+    old_path = Path("/app") / image.link.lstrip("/")
+    if old_path.exists():
+        old_path.unlink()
+    
+    # Generate unique filename
+    import uuid
+    unique_filename = f"{uuid.uuid4()}{file_ext}"
+    file_path = UPLOAD_DIR / unique_filename
+    
+    # Save the new file
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    # Update the image record with new path
+    image.link = f"/uploads/images/{unique_filename}"
     db.commit()
     db.refresh(image)
     

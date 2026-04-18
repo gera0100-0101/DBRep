@@ -17,6 +17,20 @@ export const productApi = {
   update: (id, product) => api.put(`/products/${id}`, product),
   delete: (id) => api.delete(`/products/${id}`),
   getImages: (productId) => api.get(`/products/${productId}/images`),
+  addImageWithFile: (productId, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(`/products/${productId}/images`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  updateImageWithFile: (productId, imageId, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.put(`/products/${productId}/images/${imageId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
   addImage: (productId, imageData) => api.post(`/products/${productId}/images`, imageData),
   updateImage: (productId, imageId, imageData) => api.put(`/products/${productId}/images/${imageId}`, imageData),
   deleteImage: (productId, imageId) => api.delete(`/products/${productId}/images/${imageId}`),

@@ -13,7 +13,7 @@ function AdminPanel() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productImages, setProductImages] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [imageForm, setImageForm] = useState({ link: '' });
+  const [imageForm, setImageForm] = useState({ link: '', file: null });
   const [editingImageId, setEditingImageId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -143,7 +143,7 @@ function AdminPanel() {
   // Image management functions
   const handleOpenImageModal = async (product) => {
     setSelectedProduct(product);
-    setImageForm({ link: '' });
+    setImageForm({ link: '', file: null });
     setEditingImageId(null);
     try {
       const imagesRes = await productApi.getImages(product.id);
@@ -159,24 +159,41 @@ function AdminPanel() {
     setShowImageModal(false);
     setSelectedProduct(null);
     setProductImages([]);
-    setImageForm({ link: '' });
+    setImageForm({ link: '', file: null });
+    setEditingImageId(null);
+  };
+
+  const handleFileChange = (e) => {
+    setImageForm({ ...imageForm, file: e.target.files[0], link: '' });
     setEditingImageId(null);
   };
 
   const handleAddImage = async (e) => {
     e.preventDefault();
-    if (!imageForm.link.trim()) return;
+    if (!imageForm.file && !imageForm.link.trim()) {
+      alert('Please select a file or enter a link');
+      return;
+    }
     
     try {
       if (editingImageId) {
-        await productApi.updateImage(selectedProduct.id, editingImageId, { link: imageForm.link });
+        // Update image with file upload
+        if (imageForm.file) {
+          await productApi.updateImageWithFile(selectedProduct.id, editingImageId, imageForm.file);
+        }
       } else {
-        await productApi.addImage(selectedProduct.id, { link: imageForm.link });
+        // Add new image with file upload
+        if (imageForm.file) {
+          await productApi.addImageWithFile(selectedProduct.id, imageForm.file);
+        }
       }
-      setImageForm({ link: '' });
+      setImageForm({ link: '', file: null });
       setEditingImageId(null);
       const imagesRes = await productApi.getImages(selectedProduct.id);
       setProductImages(imagesRes.data);
+      // Reset file input
+      const fileInput = document.getElementById('imageFile');
+      if (fileInput) fileInput.value = '';
     } catch (error) {
       console.error('Error saving image:', error);
       alert('Failed to save image');
@@ -184,7 +201,7 @@ function AdminPanel() {
   };
 
   const handleEditImage = (image) => {
-    setImageForm({ link: image.link });
+    setImageForm({ link: image.link, file: null });
     setEditingImageId(image.id);
   };
 
@@ -585,13 +602,23 @@ function AdminPanel() {
             
             <form onSubmit={handleAddImage} className="image-form">
               <div className="form-group">
-                <label htmlFor="image-link">Image URL</label>
+                <label htmlFor="imageFile">Upload Image File</label>
+                <input
+                  type="file"
+                  id="imageFile"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="image-link">Or Image URL</label>
                 <input
                   type="url"
                   id="image-link"
                   value={imageForm.link}
                   onChange={(e) => setImageForm({...imageForm, link: e.target.value})}
                   placeholder="https://example.com/image.jpg"
+                  disabled={!!imageForm.file}
                 />
               </div>
               <button type="submit" className="save-btn">
@@ -607,7 +634,7 @@ function AdminPanel() {
                 <div className="images-grid">
                   {productImages.map(image => (
                     <div key={image.id} className="image-item">
-                      <img src={image.link} alt="Product" style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '4px' }} />
+                      <img src={image.link.startsWith('/') ? `${import.meta.env.VITE_API_URL}${image.link}` : image.link} alt="Product" style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '4px' }} />
                       <div className="image-actions">
                         <button 
                           className="action-btn edit-btn"

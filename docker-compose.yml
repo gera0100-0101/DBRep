@@ -63,3 +63,4 @@ networks:
 
 volumes:
   postgres_data:
+  backend_uploads:
